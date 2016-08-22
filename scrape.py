@@ -11,7 +11,7 @@ HOST = 'https://www.sharecoffeeroasters.com'
 SIGN_IN_URL = HOST + '/wholesalers/sign_in'
 NEW_ORDER_URL = HOST + '/wholesale_orders/new'
 
-COOKIE = '_ShareCoffee_session'
+SIZES = ['6oz', '12oz', '3lb']
 
 
 def share_session(username, password):
@@ -98,7 +98,16 @@ def main():
     for li in offerings:
         coffee = parse_offering(li)
 
-        for size in coffee['pricepoints']:
+        # check that the sizes we got from the API match the hardcoded
+        # values in this script (we hardcode them to ensure printing
+        # out rows in the ideal order)
+        seen_sizes = set(coffee['pricepoints'].keys())
+        bad_sizes = seen_sizes.symmetric_difference(SIZES)
+        if len(bad_sizes):
+            sys.stderr.write('ERROR: unknown pricepoints: %s' % (bad_sizes,))
+            return 1
+
+        for size in SIZES:
             price = coffee['pricepoints'][size]
 
             data = '%s\t%s\t%s' % (coffee['name'], size, price)
