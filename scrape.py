@@ -100,10 +100,12 @@ def main():
 
         for size in coffee['pricepoints']:
             price = coffee['pricepoints'][size]
+
+            data = '%s\t%s\t%s' % (coffee['name'], size, price)
             if size == '6oz':
-                print('%s\t%s\t%s\t%s' % (coffee['name'], size, price, coffee['msrp']))
-            else:
-                print('%s\t%s\t%s' % (coffee['name'], size, price))
+                data += '\t%s' % coffee['msrp']
+
+            sys.stdout.write(data + '\n')
 
 
 if __name__ == '__main__':
