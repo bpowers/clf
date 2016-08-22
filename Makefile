@@ -8,7 +8,7 @@ all: run
 
 env: Makefile requirements.txt
 	@echo "  VENV update"
-	@virtualenv env -q -p python2
+	@virtualenv env -q -p python3
 	@$(PWD)/env/bin/easy_install -q -U distribute
 	@$(PWD)/env/bin/easy_install -q -U pip
 	$(PWD)/env/bin/pip install -r requirements.txt
