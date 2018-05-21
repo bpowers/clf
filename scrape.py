@@ -11,6 +11,9 @@ HOST = 'https://www.sharecoffeeroasters.com'
 SIGN_IN_URL = HOST + '/wholesalers/sign_in'
 NEW_ORDER_URL = HOST + '/wholesale_orders/new'
 
+CICS_MARKUP = 1.10
+CICS_SLUSH = .09
+
 SIZES = ['6oz', '12oz', '3lb']
 
 
@@ -54,7 +57,7 @@ def parse_offering(li):
     name = ' '.join(name_col.div.get_text().split())
     pricepoints = {}
 
-    # for 6oz bag
+    # 6oz bags have an MSRP field, but other sizes don't
     msrp = ''
 
     rows = [c for c in price_col.children if c.name == 'div' and 'row' in c.attrs.get('class', [])]
@@ -67,10 +70,12 @@ def parse_offering(li):
         price_container = r.find_all('div', class_='input-group-addon')[0]
         price_div = price_container.find_all('div', class_='text-left')[0]
         price = price_div.contents[0].strip()
+
         if size == '6oz':
             msrp = price_div.find_all('small', class_='small')[0].get_text()
             msrp = msrp.strip()
             #msrp = msrp.strip().split()[1][:-1]
+
         pricepoints[size] = price
 
     return {
@@ -108,9 +113,9 @@ def main():
             return 1
 
         for size in SIZES:
-            price = coffee['pricepoints'][size]
+            price = float(coffee['pricepoints'][size][1:]) * CICS_MARKUP + CICS_SLUSH
 
-            data = '%s\t%s\t%s' % (coffee['name'], size, price)
+            data = '%s\t%s\t$%.1f0' % (coffee['name'], size, price)
             if size == '6oz':
                 data += '\t%s' % coffee['msrp']
 
